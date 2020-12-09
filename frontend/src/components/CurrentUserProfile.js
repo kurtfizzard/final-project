@@ -4,15 +4,9 @@ import Review from "./Review";
 import { CurrentUserContext } from "./reducers/userReducer";
 import Loading from "./Loading";
 
-const ProfilePage = () => {
+const CurrentUserProfile = () => {
   const { currentUser } = useContext(CurrentUserContext);
   const [reviews, setReviews] = useState([]);
-
-  // CAN THIS DOUBLE AS A PAGE TO DISPLAY ANOTHER USER'S PROFILE?
-
-  // HOW TO QUERY FIREBASE FOR USER INFO?
-
-  // NEED TO INCLUDE PROFILE PICTURE
 
   useEffect(() => {
     fetch(`http://localhost:8000/reviews/user/${currentUser.user.uid}`)
@@ -29,15 +23,13 @@ const ProfilePage = () => {
       </>
     );
   } else {
-    const { displayName } = currentUser.user;
-    console.log(currentUser);
+    const { username } = currentUser.user;
 
     return (
       <Wrapper>
-        <Username>{displayName}</Username>
+        <Username>{username}</Username>
         <Container>
           {reviews.reverse().map((review) => {
-            // console.log(review);
             return <Review key={Math.random()} props={review} />;
           })}
         </Container>
@@ -63,4 +55,4 @@ const Container = styled.div`
   width: 80%;
 `;
 
-export default ProfilePage;
+export default CurrentUserProfile;

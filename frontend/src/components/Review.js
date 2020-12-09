@@ -2,8 +2,8 @@ import React, { useContext, useState } from "react";
 import { useHistory } from "react-router-dom";
 import styled from "styled-components";
 import { CurrentUserContext } from "./reducers/userReducer";
-import { FaHeart, FaRegHeart } from "react-icons/fa";
-import StarRatingBar from "./StarRatingBar";
+import LikeButton from "./LikeButton";
+import ReviewRating from "./ReviewRating";
 
 const Review = ({ props }) => {
   const { currentUser } = useContext(CurrentUserContext);
@@ -13,6 +13,7 @@ const Review = ({ props }) => {
     _id,
     likeCount,
     likes,
+    rating,
     releaseId,
     review,
     title,
@@ -22,6 +23,8 @@ const Review = ({ props }) => {
   const [isLikedbyCurrentUser, setIsLikedbyCurrentUser] = useState(
     likes.includes(currentUser.user.uid)
   );
+
+  console.log(props);
 
   const likeReview = () => {
     fetch(`http://localhost:8000/reviews/${_id}/like`, {
@@ -41,42 +44,22 @@ const Review = ({ props }) => {
   };
 
   return (
-    <Wrapper>
-      <Content onClick={() => history.push(`/releasepage/${releaseId}`)}>
-        <div>
-          {artists[0].name} - {title} ({year})
-        </div>
-        <p>{review}</p>
-        <p>{date}</p>
-        <LikeButtonDiv>
-          <LikeButton
-            onClick={(e) => {
-              e.preventDefault();
-              likeReview();
-            }}
-          >
-            {isLikedbyCurrentUser ? <FaHeart /> : <FaRegHeart />}
-          </LikeButton>
-          <p>{likeCount}</p>
-        </LikeButtonDiv>
-      </Content>
+    <Wrapper onClick={() => history.push(`/release/${releaseId}`)}>
+      <div>
+        {artists[0].name} - {title} ({year})
+      </div>
+      <ReviewRating rating={rating} />
+      <p>{review}</p>
+      <p>{date}</p>
+      <LikeButton
+        isLikedbyCurrentUser={isLikedbyCurrentUser}
+        likeCount={likeCount}
+        likeReview={likeReview}
+      />
     </Wrapper>
   );
 };
 
 const Wrapper = styled.div``;
-
-const Content = styled.div`
-  border: 2px solid blue;
-  margin-bottom: 2%;
-`;
-
-const LikeButton = styled.button`
-  border: none;
-`;
-
-const LikeButtonDiv = styled.div`
-  display: flex;
-`;
 
 export default Review;

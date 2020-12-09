@@ -2,28 +2,20 @@ import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import styled from "styled-components";
 import { CurrentUserContext } from "./reducers/userReducer";
-import { FaHeart, FaRegHeart } from "react-icons/fa";
-import { AiFillStar, AiOutlineStar } from "react-icons/ai";
-
-const range = (num) => {
-  let array = [];
-  for (let i = 1; i <= num; i++) {
-    array.push(i);
-  }
-  return array;
-};
+import ReviewRating from "./ReviewRating";
+import LikeButton from "./LikeButton";
 
 const ReleasePageReview = ({ props }) => {
   const { currentUser } = useContext(CurrentUserContext);
   const {
     _id,
     date,
-    displayName,
     likeCount,
     likes,
     rating,
     releaseId,
     review,
+    username,
   } = props;
   let history = useHistory();
   const [isLikedbyCurrentUser, setIsLikedbyCurrentUser] = useState(
@@ -56,27 +48,17 @@ const ReleasePageReview = ({ props }) => {
   };
 
   return (
-    <Wrapper onClick={() => history.push(`/releasepage/${releaseId}`)}>
-      <p>
-        {displayName} - {date}
+    <Wrapper>
+      <p onClick={() => history.push(`/release/${releaseId}`)}>
+        {username} - {date}
       </p>
       <p>{review}</p>
-      <RatingDiv>
-        {range(5).map((num) => {
-          return num <= rating ? <AiFillStar /> : <AiOutlineStar />;
-        })}
-      </RatingDiv>
-      <LikeButtonDiv>
-        <LikeButton
-          onClick={(e) => {
-            e.preventDefault();
-            likeReview();
-          }}
-        >
-          {isLikedbyCurrentUser ? <FaHeart /> : <FaRegHeart />}
-        </LikeButton>
-        <p>{likeCount}</p>
-      </LikeButtonDiv>
+      <ReviewRating rating={rating} />
+      <LikeButton
+        likeReview={likeReview}
+        isLikedbyCurrentUser={isLikedbyCurrentUser}
+        likeCount={likeCount}
+      />
     </Wrapper>
   );
 };
@@ -84,18 +66,6 @@ const ReleasePageReview = ({ props }) => {
 const Wrapper = styled.div`
   border: 2px solid blue;
   margin-bottom: 2%;
-`;
-
-const RatingDiv = styled.div`
-  display: flex;
-`;
-
-const LikeButton = styled.button`
-  border: none;
-`;
-
-const LikeButtonDiv = styled.div`
-  display: flex;
 `;
 
 export default ReleasePageReview;

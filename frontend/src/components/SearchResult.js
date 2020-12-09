@@ -9,8 +9,8 @@ const SearchResult = ({ result }) => {
     <Wrapper
       onClick={() => {
         result.type === "artist"
-          ? history.push(`/artistpage/${result.id}`)
-          : history.push(`/releasepage/${result.id}`);
+          ? history.push(`/artist/${result.id}`)
+          : history.push(`/release/${result.id}`);
       }}
     >
       {result.cover_image && <Image src={result.cover_image} />}

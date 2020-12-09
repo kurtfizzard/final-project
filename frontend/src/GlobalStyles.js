@@ -11,7 +11,7 @@ ${reset};
 
 body{
     background: #E5E5E5;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Monospace', sans-serif;
     line-height: 105%;
 }
 

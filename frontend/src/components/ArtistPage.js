@@ -9,7 +9,7 @@ const ArtistPage = () => {
   const { id } = useParams();
 
   useEffect(() => {
-    fetch(`http://localhost:8000/artist/${id}`)
+    fetch(`http://localhost:8000/artistbyid/${id}`)
       .then((res) => res.json())
       .then((res) => {
         if (res.data) {

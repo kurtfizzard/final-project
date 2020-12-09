@@ -10,7 +10,7 @@ const CreateReview = ({ release }) => {
   const [textEntry, setTextEntry] = useState("");
   const { artists, id, styles, title, tracklist, year } = release;
   const [rating, setRating] = useState(0);
-  console.log(rating);
+  console.log(currentUser);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -19,13 +19,13 @@ const CreateReview = ({ release }) => {
     const date = format(new Date(), "PPP");
     // NEED TO PASS THE DATE TO
     if (currentUser && textEntry.length >= 10) {
-      const { uid, displayName } = currentUser.user;
+      const { uid, username } = currentUser.user;
       fetch("/reviews/add", {
         method: "POST",
         body: JSON.stringify({
           date: date,
           uid: uid,
-          displayName: displayName,
+          username: username,
           review: textEntry,
           artists: artists,
           likeCount: 0,

@@ -19,7 +19,10 @@ const {
   getSearchResults,
 } = require("./discogs-handlers");
 
-const { getAccessToken } = require("./spotify-handlers");
+const {
+  getAccessToken,
+  getSpotifySearchResults,
+} = require("./spotify-handlers");
 
 const { signIn, signUp, getUsers } = require("./user-handlers");
 
@@ -56,7 +59,11 @@ express()
 
   .put("/reviews/:id/like", likeReview)
 
+  /////////////////// SPOTIFY /////////////////////
+
   .get("/spotify_access_token", getAccessToken)
+
+  .post("/spotify/search", getSpotifySearchResults)
 
   .listen(PORT, () => {
     console.log(`Listening on port ${PORT}`);

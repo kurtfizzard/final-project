@@ -1,13 +1,17 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import styled from "styled-components";
 import SearchResult from "./SearchResult";
 import { FaSearch } from "react-icons/fa";
+import { SpotifyAuthContext } from "./reducers/auth-context";
 
 const Search = () => {
-  const [value, setValue] = React.useState("");
-  const [searchResults, setSearchResults] = React.useState([]);
+  const [value, setValue] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const { token } = useContext(SpotifyAuthContext);
 
-  console.log(searchResults);
+  const replaced = value.split(" ").join("+");
+
+  console.log(token);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -16,6 +20,19 @@ const Search = () => {
         .then((res) => res.json())
         .then((res) => {
           setSearchResults(res.data);
+        });
+      /////////////////////////// SPOTIFY ///////////////////////////
+      fetch(`http://localhost:8000/spotify/search`, {
+        method: "POST",
+        body: JSON.stringify({ token: token.token, value: value }),
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      })
+        .then((res) => res.json())
+        .then((res) => {
+          console.log(res.results);
         });
     }
   };

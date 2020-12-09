@@ -5,7 +5,7 @@ import { CurrentUserContext } from "./reducers/userReducer";
 import { format } from "date-fns";
 import StarRatingBar from "./StarRatingBar";
 
-const CreateReview = ({ release }) => {
+const CreateReview = ({ release, render, setRender }) => {
   const { currentUser } = useContext(CurrentUserContext);
   const [textEntry, setTextEntry] = useState("");
   const { artists, id, styles, title, tracklist, year } = release;
@@ -45,6 +45,7 @@ const CreateReview = ({ release }) => {
         .then((res) => res.json())
         .then((res) => {
           console.log(res);
+          setRender(!render);
         });
       setTextEntry("");
     } else {

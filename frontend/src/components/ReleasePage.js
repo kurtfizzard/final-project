@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import CreateReview from "./CreateReview";
@@ -7,9 +7,10 @@ import ReleasePageReview from "./ReleasePageReview";
 import Track from "./Track";
 
 const ReleasePage = () => {
-  const [release, setRelease] = React.useState(null);
+  const [release, setRelease] = useState(null);
   const { id } = useParams();
-  const [reviews, setReviews] = React.useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [render, setRender] = useState(false);
 
   useEffect(() => {
     fetch(`http://localhost:8000/releasebyid/${id}`)
@@ -22,7 +23,7 @@ const ReleasePage = () => {
       .then((res) => {
         setReviews(res.data);
       });
-  }, []);
+  }, [render]);
 
   // NEED TO TRIGGER A RERENDER TO UPDATE THE REVIEWS WHEN A NEW ONE IS SUBMITTED
 
@@ -46,7 +47,7 @@ const ReleasePage = () => {
             return <ReleasePageReview key={Math.random()} props={review} />;
           })}
         </ReviewContainer>
-        <CreateReview release={release} />
+        <CreateReview release={release} render={render} setRender={setRender} />
       </Wrapper>
     );
   } else {

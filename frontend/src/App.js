@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import Home from "./components/Home";
 import Header from "./components/Header";
@@ -12,28 +12,24 @@ import GlobalStyle from "./GlobalStyles";
 import ScrollToTop from "./components/ScrollToTop";
 import SignUpPage from "./components/SignUpPage";
 import UserProfile from "./components/UserProfile";
-import {
-  receiveAccessToken,
-  receiveAccessTokenError,
-  requestAccessToken,
-} from "./components/Actions";
-
-// import { useDispatch } from "react-redux";
+import { SpotifyAuthContext } from "./components/reducers/auth-context";
 
 const App = () => {
-  // const dispatch = useDispatch();
+  const { token, dispatchToken } = useContext(SpotifyAuthContext);
+
+  console.log(token);
 
   useEffect(() => {
-    // dispatch(requestAccessToken());
     fetch("/spotify_access_token")
       .then((res) => res.json())
       .then((json) => {
-        console.log(json.access_token);
-        // dispatch(receiveAccessToken(json.access_token));
+        dispatchToken({
+          type: "RECEIVE_ACCESS_TOKEN",
+          token: json.access_token,
+        });
       })
       .catch((err) => {
         console.error(err);
-        // dispatch(receiveAccessTokenError());
       });
   }, []);
 

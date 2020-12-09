@@ -8,7 +8,6 @@ const initialState = {
 };
 
 const userReducer = (state, action) => {
-  console.log(action);
   switch (action.type) {
     case "SIGN_UP": {
       return {
@@ -50,9 +49,7 @@ const UserProvider = ({ children }) => {
       value={{
         currentUser,
         dispatchCurrentUser,
-        // signInWithEmail,
         signOut,
-        // signUp,
       }}
     >
       {children}

@@ -3,11 +3,14 @@ const { MongoClient, ObjectID } = require("mongodb");
 require("dotenv").config({ path: `${__dirname}/.env` });
 const { MONGO_URI } = process.env;
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const options = {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 };
+
+const secret = "uwyM3UnU";
 
 const signUp = async (req, res) => {
   console.log(req.body);
@@ -72,21 +75,22 @@ const signIn = async (req, res) => {
         req.body.password,
         user.password
       );
-      console.log(validPassword);
       if (validPassword) {
+        const token = jwt.sign({ _id: user._id }, secret);
+        console.log(token);
         res.status(200).json({
           status: 200,
-          user: { uid: user._id, username: user.username },
+          user: { uid: user._id, username: user.username, token: token },
         });
       } else {
-        res.status(200).json({
-          status: 200,
+        res.status(400).json({
+          status: 400,
           message: "The password that you entered was invalid.",
         });
       }
     } else {
-      res.status(200).json({
-        status: 200,
+      res.status(400).json({
+        status: 400,
         message: "This is not a valid username. Please sign up.",
       });
     }
@@ -116,8 +120,37 @@ const getUsers = async (req, res) => {
   console.log("disconnected!");
 };
 
+const getCurrentUser = async (req, res) => {
+  console.log(req.headers);
+  if (!req.headers.token) {
+    return res.status(400).json({ message: "Unauthorized." });
+  }
+  const token = req.headers.token;
+  const decoded = jwt.verify(token, secret);
+  console.log(decoded);
+
+  const client = await MongoClient(MONGO_URI, options);
+
+  try {
+    await client.connect();
+    const db = client.db("project-database");
+    console.log("connected!");
+
+    const user = await db
+      .collection("users")
+      .findOne({ _id: ObjectID(decoded._id) });
+    console.log(user);
+    res.status(200).json({ status: 200, user: user });
+  } catch (err) {
+    console.log(err.message);
+  }
+  client.close();
+  console.log("disconnected!");
+};
+
 module.exports = {
   signIn,
   signUp,
+  getCurrentUser,
   getUsers,
 };

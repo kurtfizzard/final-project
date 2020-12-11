@@ -2,7 +2,6 @@
 
 const express = require("express");
 const cors = require("cors");
-
 const morgan = require("morgan");
 
 const {
@@ -10,21 +9,18 @@ const {
   getReviews,
   getUserReviews,
   likeReview,
-  getReviewsByRelease,
+  getReviewbyReviewId,
+  getReviewsByUserId,
 } = require("./review-handlers");
 
 const {
-  getReleaseById,
-  getReleasesByArtist,
-  getSearchResults,
-} = require("./discogs-handlers");
-
-const {
   getAccessToken,
+  getAlbumsByArtist,
+  getReleaseById,
   getSpotifySearchResults,
 } = require("./spotify-handlers");
 
-const { signIn, signUp, getUsers } = require("./user-handlers");
+const { signIn, signUp, getUsers, getCurrentUser } = require("./user-handlers");
 
 const PORT = process.env.PORT || 8000;
 
@@ -37,7 +33,6 @@ express()
   .use(cors())
 
   .post("/auth/signin", signIn)
-  // CAN THIS POST BE A GET?
 
   .post("/auth/signup", signUp)
 
@@ -49,21 +44,21 @@ express()
 
   .get("/reviews/user/:id", getUserReviews)
 
-  .get("/search/:value", getSearchResults)
+  .post("/artistbyid/:id", getAlbumsByArtist)
 
-  .get("/artistbyid/:id", getReleasesByArtist)
+  .post("/releasebyid/:id", getReleaseById)
 
-  .get("/releasebyid/:id", getReleaseById)
-
-  .get("/reviews/release/:id", getReviewsByRelease)
+  .get("/reviews/release/:id", getReviewsByUserId)
 
   .put("/reviews/:id/like", likeReview)
-
-  /////////////////// SPOTIFY /////////////////////
 
   .get("/spotify_access_token", getAccessToken)
 
   .post("/spotify/search", getSpotifySearchResults)
+
+  .get("/reviews/:id", getReviewbyReviewId)
+
+  .get("/me", getCurrentUser)
 
   .listen(PORT, () => {
     console.log(`Listening on port ${PORT}`);

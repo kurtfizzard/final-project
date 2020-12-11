@@ -112,7 +112,7 @@ const getUserReviews = async (req, res) => {
   console.log("disconnected!");
 };
 
-const getReviewsByRelease = async (req, res) => {
+const getReviewsByUserId = async (req, res) => {
   const { id } = req.params;
   console.log(id);
   const client = await MongoClient(MONGO_URI, options);
@@ -122,7 +122,7 @@ const getReviewsByRelease = async (req, res) => {
     console.log("connected!");
 
     const results = await db.collection("reviews").find().toArray();
-    const reviews = results.filter((result) => result.releaseId === Number(id));
+    const reviews = results.filter((result) => result.releaseId === id);
 
     res.status(200).json({ status: 200, data: reviews });
   } catch (err) {
@@ -167,10 +167,30 @@ const likeReview = async (req, res) => {
   console.log("disconnected!");
 };
 
+const getReviewbyReviewId = async (req, res) => {
+  const client = await MongoClient(MONGO_URI, options);
+
+  try {
+    await client.connect();
+    const db = client.db("project-database");
+    console.log("connected!");
+
+    const query = { _id: ObjectID(req.params.id) };
+    const review = await db.collection("reviews").findOne(query);
+    res.status(200).json({ status: 200, data: review });
+  } catch (err) {
+    console.log(err.stack);
+    res.status(500).json({ status: 500, data: req.body, message: err.message });
+  }
+  client.close();
+  console.log("disconnected!");
+};
+
 module.exports = {
   addReview,
   getReviews,
   getUserReviews,
-  getReviewsByRelease,
+  getReviewbyReviewId,
+  getReviewsByUserId,
   likeReview,
 };

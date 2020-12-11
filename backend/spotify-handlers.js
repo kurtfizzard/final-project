@@ -27,38 +27,61 @@ const getAccessToken = async (req, res) => {
 };
 
 const getSpotifySearchResults = async (req, res) => {
-  console.log(req.body);
   const { token, value } = req.body;
   const replaced = value.split(" ").join("%20");
 
-  console.log(replaced);
-
   fetch(
-    `https://api.spotify.com/v1/search?q=${replaced}&type=album,artist&market=CA`,
-    // "https://api.spotify.com/v1/search?q=tania%20bowra&type=artist",
+    `https://api.spotify.com/v1/search?q=${replaced}&type=artist&market=CA`,
     {
       headers: { Authorization: `Bearer ${token}` },
     }
   )
     .then((res) => res.json())
     .then((data) => {
-      // const {
-      //   albumsArtists: artists,
-      //   albumsId: id,
-      //   albumsImages: images,
-      //   albumsName: name,
-      //   albumsReleaseDate: release_date,
-      //   albumsType: type,
-      // } = res.albums.items;
-      // const { artistsId: id, artistsImages: images, artistsName: name, artistsType: type } = res.artists.items;
       res.status(200).json({
         status: 200,
-        results: { albums: data.albums.items, artists: data.artists.items },
+        results: {
+          artists: data.artists.items,
+        },
+      });
+    });
+};
+
+const getAlbumsByArtist = async (req, res) => {
+  const { token } = req.body;
+  const { id } = req.params;
+
+  fetch(`https://api.spotify.com/v1/artists/${id}/albums`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      res.status(200).json({
+        status: 200,
+        albums: data.items,
+      });
+    });
+};
+
+const getReleaseById = async (req, res) => {
+  const { id } = req.params;
+  const { token } = req.body;
+
+  fetch(`https://api.spotify.com/v1/albums/${id}	`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      res.status(200).json({
+        status: 200,
+        data: data,
       });
     });
 };
 
 module.exports = {
   getAccessToken,
+  getAlbumsByArtist,
+  getReleaseById,
   getSpotifySearchResults,
 };

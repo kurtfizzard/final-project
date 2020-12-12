@@ -8,16 +8,14 @@ import StarRatingBar from "./StarRatingBar";
 const CreateReview = ({ release, render, setRender }) => {
   const { currentUser } = useContext(CurrentUserContext);
   const [textEntry, setTextEntry] = useState("");
-  const { artists, id, styles, title, tracklist, year } = release;
+  const { artists, id, images, name, release_date } = release;
   const [rating, setRating] = useState(0);
-  console.log(currentUser);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // const date = format(new Date(2014, 1, 11), "MM/dd/yyyy");
-    // const date = new Date();
+
     const date = format(new Date(), "PPP");
-    // NEED TO PASS THE DATE TO
+
     if (currentUser && textEntry.length >= 10) {
       const { uid, username } = currentUser.user;
       fetch("/reviews/add", {
@@ -32,10 +30,9 @@ const CreateReview = ({ release, render, setRender }) => {
           likes: [],
           rating: rating,
           releaseId: id,
-          styles: styles,
-          title: title,
-          tracklist: tracklist,
-          year: year,
+          images,
+          name: name,
+          release_date: release_date,
         }),
         headers: {
           Accept: "application/json",
@@ -85,19 +82,23 @@ const Form = styled.form`
 
 const TextBox = styled.textarea`
   resize: none;
-  margin-bottom: 10px;
+  margin-bottom: 2%;
+  margin-top: 2%;
+  height: 5em;
   width: 100%;
 `;
 
 const Submit = styled.button`
   align-items: center;
-  background: #fca311;
-  border: none;
+  /* background: #fca311; */
+  /* border: none; */
   border-radius: 5px;
   display: flex;
-  font-weight: bold;
+  font-size: 1.2em;
+  /* font-weight: bold; */
   height: auto;
   justify-content: center;
+  margin-top: 2%;
 `;
 
 export default CreateReview;

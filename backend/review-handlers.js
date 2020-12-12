@@ -93,6 +93,7 @@ const getReviews = async (req, res) => {
 
 const getUserReviews = async (req, res) => {
   const { uid } = req.params;
+  console.log(req.params);
   const client = await MongoClient(MONGO_URI, options);
   try {
     await client.connect();

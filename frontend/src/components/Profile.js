@@ -1,36 +1,47 @@
 import React, { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
-import Review from "./Review";
-import { CurrentUserContext } from "./reducers/userReducer";
 import Loading from "./Loading";
+import { useHistory, useParams } from "react-router";
+import { CurrentUserContext } from "./reducers/userReducer";
 
-const CurrentUserProfile = () => {
+const Profile = () => {
   const { currentUser } = useContext(CurrentUserContext);
   const [reviews, setReviews] = useState([]);
+  const { id } = useParams();
+  console.log(id);
+  console.log(reviews);
+
+  let history = useHistory();
 
   useEffect(() => {
-    fetch(`http://localhost:8000/reviews/user/${currentUser.user.uid}`)
+    fetch(`http://localhost:8000/reviews/user/${id}`)
       .then((res) => res.json())
       .then((res) => {
         setReviews(res.data);
       });
   }, []);
 
-  if (currentUser.loading === true) {
+  if (reviews.length === 0) {
     return (
       <>
         <Loading />
       </>
     );
   } else {
-    const { username } = currentUser.user;
-
     return (
       <Wrapper>
-        <Username>{username}</Username>
+        <Username>{reviews[0].username}</Username>
         <Container>
           {reviews.reverse().map((review) => {
-            return <Review key={Math.random()} props={review} />;
+            return (
+              <CoverPhoto
+                key={Math.random()}
+                src={review.images[1].url}
+                onClick={() => {
+                  history.push(`/review/${review._id}`);
+                }}
+              />
+            );
           })}
         </Container>
       </Wrapper>
@@ -46,13 +57,20 @@ const Wrapper = styled.div`
 `;
 
 const Username = styled.p`
-  font-size: 1.2em;
+  font-size: 2em;
   font-weight: bold;
   margin-bottom: 2%;
 `;
 
 const Container = styled.div`
-  width: 80%;
+  display: flex;
+  flex-wrap: wrap;
+  width: 90%;
 `;
 
-export default CurrentUserProfile;
+const CoverPhoto = styled.img`
+  margin: 0.5%;
+  width: 32%;
+`;
+
+export default Profile;

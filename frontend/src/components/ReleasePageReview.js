@@ -5,7 +5,7 @@ import { CurrentUserContext } from "./reducers/userReducer";
 import ReviewRating from "./ReviewRating";
 import LikeButton from "./LikeButton";
 
-const ReleasePageReview = ({ props }) => {
+const ReleasePageReview = ({ props, render, setRender }) => {
   const { currentUser } = useContext(CurrentUserContext);
   const {
     _id,
@@ -15,20 +15,13 @@ const ReleasePageReview = ({ props }) => {
     rating,
     releaseId,
     review,
+    uid,
     username,
   } = props;
   let history = useHistory();
   const [isLikedbyCurrentUser, setIsLikedbyCurrentUser] = useState(
     likes.includes(currentUser.user.uid)
   );
-
-  console.log(props);
-
-  // THE REVIEW NEEDS TO BE ABLE TO NAVIGATE TO THE WRITER'S PROFILE
-
-  // NEED TO TRIGGER A RERENDER
-
-  useEffect(() => {}, [isLikedbyCurrentUser]);
 
   const likeReview = () => {
     fetch(`http://localhost:8000/reviews/${_id}/like`, {
@@ -43,29 +36,61 @@ const ReleasePageReview = ({ props }) => {
     })
       .then((res) => res.json())
       .then((res) => {
-        setIsLikedbyCurrentUser(likes.includes(currentUser.user.uid));
+        setIsLikedbyCurrentUser(!isLikedbyCurrentUser);
+        setRender(!render);
       });
   };
 
   return (
-    <Wrapper>
-      <p onClick={() => history.push(`/release/${releaseId}`)}>
-        {username} - {date}
-      </p>
+    <Wrapper onClick={() => history.push(`/review/${_id}`)}>
+      <TopContainer>
+        <Username
+          onClick={(e) => {
+            e.stopPropagation();
+            history.push(`/profile/${uid}`);
+          }}
+        >
+          {username}
+        </Username>
+        <Date>{date}</Date>
+      </TopContainer>
       <p>{review}</p>
-      <ReviewRating rating={rating} />
-      <LikeButton
-        likeReview={likeReview}
-        isLikedbyCurrentUser={isLikedbyCurrentUser}
-        likeCount={likeCount}
-      />
+      <BottomContainer>
+        <ReviewRating rating={rating} />
+        <LikeButton
+          likeReview={likeReview}
+          isLikedbyCurrentUser={isLikedbyCurrentUser}
+          likeCount={likeCount}
+        />
+      </BottomContainer>
     </Wrapper>
   );
 };
 
 const Wrapper = styled.div`
-  border: 2px solid blue;
+  border-bottom: 1px solid black;
   margin-bottom: 2%;
+  padding-bottom: 2%;
+`;
+
+const TopContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2%;
+`;
+
+const Username = styled.p`
+  font-weight: bold;
+`;
+
+const Date = styled.p`
+  font-size: 0.75em;
+`;
+
+const BottomContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2%;
 `;
 
 export default ReleasePageReview;

@@ -29,7 +29,7 @@ const signUp = async (req, res) => {
     if (user) {
       res.status(200).json({
         status: 200,
-        message: "This username is already in use.",
+        message: "That username is already in use. Please try again.",
       });
     } else {
       const hash = bcrypt.hashSync(req.body.password, 8);
@@ -40,6 +40,7 @@ const signUp = async (req, res) => {
       console.log(result.ops[0]);
       res.status(201).json({
         status: 201,
+        message: "Your account has been successfully created. Please sign in.",
         user: {
           uid: result.ops[0]._id,
           username: result.ops[0].username,
@@ -68,7 +69,6 @@ const signIn = async (req, res) => {
     const user = await db
       .collection("users")
       .findOne({ username: req.body.username });
-    console.log(user);
 
     if (user) {
       const validPassword = await bcrypt.compare(
@@ -81,17 +81,20 @@ const signIn = async (req, res) => {
         res.status(200).json({
           status: 200,
           user: { uid: user._id, username: user.username, token: token },
+          message: `Welcome back ${user.username}.`,
         });
       } else {
-        res.status(400).json({
+        res.status(200).json({
           status: 400,
-          message: "The password that you entered was invalid.",
+          message:
+            "The password that you entered is invalid, please re-enter your password or confirm that the username provided is correct.",
         });
       }
     } else {
-      res.status(400).json({
+      res.status(200).json({
         status: 400,
-        message: "This is not a valid username. Please sign up.",
+        message:
+          "This is not a valid username. Please use a different username or sign up.",
       });
     }
   } catch (err) {
@@ -148,9 +151,60 @@ const getCurrentUser = async (req, res) => {
   console.log("disconnected!");
 };
 
+const followUser = async (req, res) => {
+  console.log(req.params);
+  console.log(req.body);
+
+  const client = await MongoClient(MONGO_URI, options);
+
+  try {
+    await client.connect();
+    const db = client.db("project-database");
+    console.log("connected!");
+
+    const currentUserId = { _id: ObjectID(req.body.currentUserUID) };
+    const targetUserId = { _id: ObjectID(req.params.id) };
+
+    if (currentUser.followers.includes(targetUserId)) {
+      const resultOne = await db
+        .collection("users")
+        .findOneAndUpdate(targetUserId, {
+          $inc: { followerCount: -1 },
+          $pull: { followers: currentUserId },
+        });
+      const resultTwo = await db
+        .collection("users")
+        .findOneAndUpdate(currentUserId, {
+          $inc: { followingCount: -1 },
+          $pull: { following: targetUserId },
+        });
+      res.status(200).json({ status: 200, data: { resultOne, resultTwo } });
+    } else {
+      const resultOne = await db
+        .collection("users")
+        .findOneAndUpdate(targetUserId, {
+          $inc: { followerCount: 1 },
+          $push: { followers: currentUserId },
+        });
+      const resultTwo = await db
+        .collection("users")
+        .findOneAndUpdate(currentUserId, {
+          $inc: { followingCount: 1 },
+          $push: { following: targetUserId },
+        });
+      res.status(200).json({ status: 200, data: { resultOne, resultTwo } });
+    }
+  } catch (err) {
+    console.log(err.message);
+  }
+  client.close();
+  console.log("disconnected!");
+};
+
 module.exports = {
   signIn,
   signUp,
   getCurrentUser,
   getUsers,
+  followUser,
 };

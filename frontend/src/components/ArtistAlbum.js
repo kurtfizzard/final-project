@@ -3,21 +3,21 @@ import { useHistory } from "react-router-dom";
 import styled from "styled-components";
 import Loading from "./Loading";
 
-const SearchResult = ({ result }) => {
+const ArtistAlbum = ({ album }) => {
   let history = useHistory();
 
-  if (result) {
-    const { id, images, name, type } = result;
+  if (album) {
+    const { artists, id, images, name, release_date } = album;
     return (
       <Wrapper
         onClick={() => {
-          history.push(`/artist/${id}`);
+          history.push(`/release/${id}`);
         }}
       >
         {images[1] && <Image src={images[1].url} />}
         <Container>
           <Title>{name}</Title>
-          <Info>{type}</Info>
+          <Info>{release_date.slice(0, 4)}</Info>
         </Container>
       </Wrapper>
     );
@@ -32,11 +32,12 @@ const Wrapper = styled.div`
   align-items: center;
   display: flex;
   height: 100px;
-  margin-bottom: 2%;
+  padding: 10px;
+  width: 90%;
 `;
 
 const Image = styled.img`
-  height: 100%;
+  height: 100px;
   margin-right: 5%;
   width: 100px;
 `;
@@ -52,4 +53,4 @@ const Info = styled.p`
   font-size: 0.9em;
 `;
 
-export default SearchResult;
+export default ArtistAlbum;

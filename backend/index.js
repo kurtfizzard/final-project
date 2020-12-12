@@ -11,6 +11,7 @@ const {
   likeReview,
   getReviewbyReviewId,
   getReviewsByUserId,
+  // getUserFeedReviews,
 } = require("./review-handlers");
 
 const {
@@ -20,7 +21,13 @@ const {
   getSpotifySearchResults,
 } = require("./spotify-handlers");
 
-const { signIn, signUp, getUsers, getCurrentUser } = require("./user-handlers");
+const {
+  signIn,
+  signUp,
+  followUser,
+  getUsers,
+  getCurrentUser,
+} = require("./user-handlers");
 
 const PORT = process.env.PORT || 8000;
 
@@ -41,6 +48,10 @@ express()
   .post("/reviews/add", addReview)
 
   .get("/reviews", getReviews)
+
+  // .post("/reviews/feed/:id", getUserFeedReviews)
+
+  .post("/user/follow/:id", followUser)
 
   .get("/reviews/user/:id", getUserReviews)
 

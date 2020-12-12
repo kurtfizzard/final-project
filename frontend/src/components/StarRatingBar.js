@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import styled from "styled-components";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 
@@ -7,6 +7,7 @@ const StarRatingBar = ({ rating, setRating }) => {
     <Wrapper>
       {rating >= "1" ? (
         <AiFillStar
+          color="yellow"
           onClick={() => {
             setRating(1);
           }}
@@ -20,6 +21,7 @@ const StarRatingBar = ({ rating, setRating }) => {
       )}
       {rating >= "2" ? (
         <AiFillStar
+          color="yellow"
           onClick={() => {
             setRating(2);
           }}
@@ -33,6 +35,7 @@ const StarRatingBar = ({ rating, setRating }) => {
       )}
       {rating >= "3" ? (
         <AiFillStar
+          color="yellow"
           onClick={() => {
             setRating(3);
           }}
@@ -46,6 +49,7 @@ const StarRatingBar = ({ rating, setRating }) => {
       )}
       {rating >= "4" ? (
         <AiFillStar
+          color="yellow"
           onClick={() => {
             setRating(4);
           }}
@@ -59,6 +63,7 @@ const StarRatingBar = ({ rating, setRating }) => {
       )}
       {rating > "4" ? (
         <AiFillStar
+          color="yellow"
           onClick={() => {
             setRating(5);
           }}

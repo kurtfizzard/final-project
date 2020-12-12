@@ -10,14 +10,14 @@ const range = (num) => {
   return array;
 };
 
-const ReviewRating = ({ rating }) => {
+const ReviewRating = ({ rating, size }) => {
   return (
     <Wrapper>
       {range(5).map((num) => {
         return num <= rating ? (
-          <AiFillStar key={Math.random()} />
+          <AiFillStar color="yellow" key={Math.random()} size={size && size} />
         ) : (
-          <AiOutlineStar key={Math.random()} />
+          <AiOutlineStar key={Math.random()} size={size && size} />
         );
       })}
     </Wrapper>

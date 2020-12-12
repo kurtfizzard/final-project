@@ -12,9 +12,9 @@ const LikeButton = ({ isLikedbyCurrentUser, likeCount, likeReview }) => {
           likeReview();
         }}
       >
-        {isLikedbyCurrentUser ? <FaHeart /> : <FaRegHeart />}
+        {isLikedbyCurrentUser ? <FaHeart color="red" /> : <FaRegHeart />}
       </HeartButton>
-      <p>{likeCount}</p>
+      <LikeNumber>{likeCount}</LikeNumber>
     </Wrapper>
   );
 };
@@ -26,5 +26,7 @@ const Wrapper = styled.div`
 const HeartButton = styled.button`
   border: none;
 `;
+
+const LikeNumber = styled.p``;
 
 export default LikeButton;

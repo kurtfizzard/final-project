@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import styled from "styled-components";
 import {
   FaHome,
@@ -8,13 +8,21 @@ import {
   FaSignOutAlt,
   FaUser,
 } from "react-icons/fa";
+import { AiFillBackward } from "react-icons/ai";
 import { CurrentUserContext } from "./reducers/userReducer";
 
 const Header = () => {
   const { currentUser, signOut } = useContext(CurrentUserContext);
+  let history = useHistory();
+
+  console.log(currentUser);
 
   return (
     <Wrapper>
+      <HeaderLink onClick={() => history.goBack()}>
+        <AiFillBackward color="FCA311" size="2em" />
+        <ButtonText>Back</ButtonText>
+      </HeaderLink>
       <HeaderLink to="/">
         <FaHome color="FCA311" size="2em" />
         <ButtonText>Home</ButtonText>
@@ -23,7 +31,10 @@ const Header = () => {
         <FaSearch color="FCA311" size="2em" />
         <ButtonText>Search</ButtonText>
       </HeaderLink>
-      <HeaderLink to="/profile">
+      {/* <HeaderLink to="/profile"> */}
+      <HeaderLink
+        onClick={() => history.push(`/profile/${currentUser.user.uid}`)}
+      >
         <FaUser color="FCA311" size="2em" />
         <ButtonText>Profile</ButtonText>
       </HeaderLink>
@@ -44,7 +55,6 @@ const Header = () => {
 
 const Wrapper = styled.div`
   align-items: center;
-  /* background: #14213d; */
   background: white;
   display: flex;
   height: 10%;
@@ -55,6 +65,7 @@ const Wrapper = styled.div`
 
 const HeaderLink = styled(Link)`
   align-items: center;
+  color: black;
   display: flex;
   flex-direction: column;
   justify-content: center;

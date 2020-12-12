@@ -24,6 +24,7 @@ const userReducer = (state, action) => {
       };
     }
     case "SIGN_OUT": {
+      localStorage.clear();
       return {
         ...state,
         user: action.data,

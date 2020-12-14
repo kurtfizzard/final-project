@@ -11,7 +11,7 @@ const {
   likeReview,
   getReviewbyReviewId,
   getReviewsByUserId,
-  // getUserFeedReviews,
+  getFeedById,
 } = require("./review-handlers");
 
 const {
@@ -25,6 +25,7 @@ const {
   signIn,
   signUp,
   followUser,
+  getUserById,
   getUsers,
   getCurrentUser,
 } = require("./user-handlers");
@@ -51,6 +52,8 @@ express()
 
   // .post("/reviews/feed/:id", getUserFeedReviews)
 
+  .get("/users/:id", getUserById)
+
   .post("/user/follow/:id", followUser)
 
   .get("/reviews/user/:id", getUserReviews)
@@ -60,6 +63,8 @@ express()
   .post("/releasebyid/:id", getReleaseById)
 
   .get("/reviews/release/:id", getReviewsByUserId)
+
+  .post("/reviews/feed/:id", getFeedById)
 
   .put("/reviews/:id/like", likeReview)
 

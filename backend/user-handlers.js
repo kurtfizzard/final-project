@@ -1,5 +1,5 @@
 const assert = require("assert");
-const { MongoClient, ObjectID } = require("mongodb");
+const { MongoClient, ObjectID, ObjectId } = require("mongodb");
 require("dotenv").config({ path: `${__dirname}/.env` });
 const { MONGO_URI } = process.env;
 const bcrypt = require("bcryptjs");
@@ -13,8 +13,6 @@ const options = {
 const secret = "uwyM3UnU";
 
 const signUp = async (req, res) => {
-  console.log(req.body);
-
   const client = await MongoClient(MONGO_URI, options);
 
   try {
@@ -34,17 +32,17 @@ const signUp = async (req, res) => {
     } else {
       const hash = bcrypt.hashSync(req.body.password, 8);
 
-      const result = await db
-        .collection("users")
-        .insertOne({ username: req.body.username, password: hash });
-      console.log(result.ops[0]);
+      const result = await db.collection("users").insertOne({
+        username: req.body.username,
+        password: hash,
+        followers: [],
+        followerCount: 0,
+        following: [],
+        followingCount: 0,
+      });
       res.status(201).json({
         status: 201,
         message: "Your account has been successfully created. Please sign in.",
-        user: {
-          uid: result.ops[0]._id,
-          username: result.ops[0].username,
-        },
       });
     }
   } catch (err) {
@@ -77,11 +75,17 @@ const signIn = async (req, res) => {
       );
       if (validPassword) {
         const token = jwt.sign({ _id: user._id }, secret);
-        console.log(token);
         res.status(200).json({
           status: 200,
-          user: { uid: user._id, username: user.username, token: token },
-          message: `Welcome back ${user.username}.`,
+          user: {
+            _id: user._id,
+            username: user.username,
+            followers: user.followers,
+            followerCount: user.followerCount,
+            following: user.following,
+            followingCount: user.followingCount,
+            token: token,
+          },
         });
       } else {
         res.status(200).json({
@@ -152,9 +156,6 @@ const getCurrentUser = async (req, res) => {
 };
 
 const followUser = async (req, res) => {
-  console.log(req.params);
-  console.log(req.body);
-
   const client = await MongoClient(MONGO_URI, options);
 
   try {
@@ -162,19 +163,24 @@ const followUser = async (req, res) => {
     const db = client.db("project-database");
     console.log("connected!");
 
-    const currentUserId = { _id: ObjectID(req.body.currentUserUID) };
-    const targetUserId = { _id: ObjectID(req.params.id) };
+    const currentUserQuery = { _id: ObjectID(req.body.currentUserUID) };
+    const targetUserQuery = { _id: ObjectID(req.params.id) };
 
-    if (currentUser.followers.includes(targetUserId)) {
+    const currentUserId = req.body.currentUserUID;
+    const targetUserId = req.params.id;
+
+    const currentUser = await db.collection("users").findOne(currentUserQuery);
+
+    if (currentUser.following.includes(targetUserId)) {
       const resultOne = await db
         .collection("users")
-        .findOneAndUpdate(targetUserId, {
+        .findOneAndUpdate(targetUserQuery, {
           $inc: { followerCount: -1 },
           $pull: { followers: currentUserId },
         });
       const resultTwo = await db
         .collection("users")
-        .findOneAndUpdate(currentUserId, {
+        .findOneAndUpdate(currentUserQuery, {
           $inc: { followingCount: -1 },
           $pull: { following: targetUserId },
         });
@@ -182,13 +188,13 @@ const followUser = async (req, res) => {
     } else {
       const resultOne = await db
         .collection("users")
-        .findOneAndUpdate(targetUserId, {
+        .findOneAndUpdate(targetUserQuery, {
           $inc: { followerCount: 1 },
           $push: { followers: currentUserId },
         });
       const resultTwo = await db
         .collection("users")
-        .findOneAndUpdate(currentUserId, {
+        .findOneAndUpdate(currentUserQuery, {
           $inc: { followingCount: 1 },
           $push: { following: targetUserId },
         });
@@ -201,10 +207,43 @@ const followUser = async (req, res) => {
   console.log("disconnected!");
 };
 
+const getUserById = async (req, res) => {
+  console.log("GET USER BY ID", req.params);
+
+  const client = await MongoClient(MONGO_URI, options);
+
+  const query = { _id: ObjectID(req.params.id) };
+
+  try {
+    await client.connect();
+    const db = client.db("project-database");
+    console.log("connected!");
+
+    const user = await db.collection("users").findOne(query);
+    res.status(200).json({
+      status: 200,
+      data: {
+        _id: user._id,
+        username: user.username,
+        followers: user.followers,
+        followerCount: user.followerCount,
+        following: user.following,
+        followingCount: user.followingCount,
+      },
+    });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).json({ status: 500, message: err.message });
+  }
+  client.close();
+  console.log("disconnected!");
+};
+
 module.exports = {
   signIn,
   signUp,
   getCurrentUser,
+  getUserById,
   getUsers,
   followUser,
 };

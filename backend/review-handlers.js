@@ -8,52 +8,6 @@ const options = {
   useUnifiedTopology: true,
 };
 
-// const signIn = async (req, res) => {
-//   const { displayName, email, photoURL, uid } = req.body;
-
-//   const client = await MongoClient(MONGO_URI, options);
-
-//   try {
-//     await client.connect();
-//     const db = client.db("project-database");
-//     console.log("connected!");
-
-//     const user = await db.collection("users").findOne({ email: email });
-//     if (user) {
-//       res.status(200).json({
-//         status: 200,
-//         message: "This user is already in the database.",
-//       });
-//       return;
-//     } else {
-//       const result = await db.collection("users").insertOne({
-//         displayName: displayName,
-//         email: email,
-//         photoURL: photoURL,
-//         uid: uid,
-//       });
-//       assert.equal(1, result.insertedCount);
-//       res.status(201).json({
-//         status: 201,
-//         data: {
-//           displayName: displayName,
-//           email: email,
-//           photoURL: photoURL,
-//           uid: uid,
-//         },
-//         message: "The user has been successfully added to the database.",
-//       });
-//     }
-//   } catch (err) {
-//     console.log(err.stack);
-//     res.status(500).json({ status: 500, data: req.body, message: err.message });
-//   }
-//   client.close();
-//   console.log("disconnected!");
-// };
-
-//// REVIEW HANDLERS
-
 const addReview = async (req, res) => {
   console.log(req.body);
 
@@ -92,7 +46,7 @@ const getReviews = async (req, res) => {
 };
 
 const getUserReviews = async (req, res) => {
-  const { uid } = req.params;
+  const { id } = req.params;
   console.log(req.params);
   const client = await MongoClient(MONGO_URI, options);
   try {
@@ -102,7 +56,7 @@ const getUserReviews = async (req, res) => {
 
     const reviews = await db
       .collection("reviews")
-      .find(uid && { uid: uid })
+      .find(id && { uid: id })
       .toArray();
     res.status(200).json({ status: 200, data: reviews });
   } catch (err) {
@@ -187,11 +141,42 @@ const getReviewbyReviewId = async (req, res) => {
   console.log("disconnected!");
 };
 
+const getFeedById = async (req, res) => {
+  const { following } = req.body;
+
+  const client = await MongoClient(MONGO_URI, options);
+
+  try {
+    await client.connect();
+    const db = client.db("project-database");
+    console.log("connected!");
+
+    const reviews = await db.collection("reviews").find().toArray();
+    console.log(reviews);
+
+    const feed = [];
+
+    const fileteredReviews = reviews.map((review) => {
+      if (following.includes(review.uid)) {
+        feed.push(review);
+      }
+    });
+
+    res.status(200).json({ status: 200, data: feed });
+  } catch (err) {
+    console.log(err.stack);
+    res.status(500).json({ status: 500, data: req.body, message: err.message });
+  }
+  client.close();
+  console.log("disconnected!");
+};
+
 module.exports = {
   addReview,
   getReviews,
   getUserReviews,
   getReviewbyReviewId,
   getReviewsByUserId,
+  getFeedById,
   likeReview,
 };
